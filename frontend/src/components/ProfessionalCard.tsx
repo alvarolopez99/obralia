@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { FiMapPin, FiCheckCircle, FiStar } from 'react-icons/fi';
 import Link from 'next/link';
+import { AiFillStar } from 'react-icons/ai';
 
 interface ProfessionalCardProps {
   name: string;
@@ -40,7 +41,7 @@ function ProfessionalCard({
         <div className="flex items-center justify-between mb-1">
           <span className="text-sm font-medium text-blue-600 capitalize">{profession}</span>
           <span className="flex items-center gap-1 text-yellow-500 font-semibold text-sm">
-            <FiStar className="inline" size={16} />
+            <AiFillStar className="inline" size={16} />
             {rating}
             <span className="text-gray-400 font-normal">({reviews})</span>
           </span>

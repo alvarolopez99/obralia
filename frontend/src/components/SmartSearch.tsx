@@ -153,6 +153,8 @@ export default function SmartSearch({ professionals, className = '', variant = '
   const [searchFocused, setSearchFocused] = useState(false);
   const [locationFocused, setLocationFocused] = useState(false);
   const groupFocused = searchFocused || locationFocused;
+  const [error, setError] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Configuración de Fuse.js para búsqueda fuzzy de profesionales
   const fuse = useMemo(() => {
@@ -196,8 +198,21 @@ export default function SmartSearch({ professionals, className = '', variant = '
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
+    
+    // Si estamos en /search, no mostramos error y permitimos búsqueda vacía
+    if (window.location.pathname === '/search') {
+      if (search) params.set('search', search);
+      if (location) params.set('location', location);
+      router.push(`/search?${params.toString()}`);
+      return;
+    }
+
+    // En la landing page, mantenemos el comportamiento original
+    if (!search.trim() && !location.trim()) {
+      setError('Introduce un valor y encuentra el profesional que buscas');
+      return;
+    }
     if (search) params.set('search', search);
-    // Solo incluir location si se ha especificado una
     if (location) params.set('location', location);
     router.push(`/search?${params.toString()}`);
   };
@@ -205,15 +220,7 @@ export default function SmartSearch({ professionals, className = '', variant = '
   // Sugerencias de búsqueda
   const searchSuggestions = useMemo(() => {
     if (!search || search.length < 2) {
-      return [{
-        item: {
-          id: 'search-prompt',
-          profession: 'Introduce una profesión o servicio para empezar a buscar',
-          location: '',
-          isGeneral: true,
-          isPrompt: true
-        } as SuggestionItem
-      }];
+      return [];
     }
     
     const searchLower = search.toLowerCase();
@@ -315,97 +322,110 @@ export default function SmartSearch({ professionals, className = '', variant = '
   };
 
   return (
-    <form
-      className={`w-full max-w-2xl flex flex-col md:flex-row gap-3 md:gap-0 bg-white rounded-xl ${
-        variant === 'compact' 
-          ? 'border border-gray-200' 
-          : 'shadow-lg'
-      } ${
-        variant === 'compact' ? 'p-1' : 'p-2'
-      } transition-all ${groupFocused ? "outline outline-2 outline-blue-500" : "outline outline-0"} ${className}`}
-      onSubmit={handleSearch}
-    >
-      <div className="flex-1 flex">
-        <div className="flex-1 relative">
-          <input
-            type="text"
-            placeholder="¿Qué necesitas? Ej: fontanero, pintar habitación..."
-            className={`w-full px-4 ${
-              variant === 'compact' ? 'py-1.5' : 'py-2'
-            } rounded-l-lg md:rounded-l-xl border-none focus:outline-none text-gray-800 bg-transparent`}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-          />
-          {searchFocused && searchSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
-              {searchSuggestions.map(({ item }) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`w-full px-4 py-2 text-left hover:bg-gray-50 ${
-                    item.isPrompt ? 'text-gray-400 italic' : 'text-gray-700'
-                  }`}
-                  onClick={() => !item.isPrompt && handleSearchSuggestionClick(
-                    item.profession,
-                    item.location,
-                    item.isGeneral,
-                    item.showAll
-                  )}
-                  disabled={item.isPrompt}
-                >
-                  <div className="font-medium">{item.profession}</div>
-                  {!item.isPrompt && item.location && (
-                    <div className="text-sm text-gray-500">{item.location}</div>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex items-center bg-transparent border-l-2 border-gray-200 relative">
-          <FiMapPin className={`text-gray-400 ${variant === 'compact' ? 'ml-1.5' : 'ml-2'}`} />
-          <input
-            type="text"
-            placeholder="Tu ubicación"
-            className={`w-32 md:w-40 px-2 ${
-              variant === 'compact' ? 'py-1.5' : 'py-2'
-            } border-none focus:outline-none text-gray-800 bg-transparent rounded-r-lg`}
-            value={location}
-            onChange={e => setLocation(e.target.value)}
-            onFocus={() => setLocationFocused(true)}
-            onBlur={() => setTimeout(() => setLocationFocused(false), 200)}
-          />
-          {locationSuggestions.length > 0 && locationFocused && (
-            <div className="absolute top-full right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50 w-full">
-              {locationSuggestions.map(({ item }) => (
-                <button
-                  key={item}
-                  type="button"
-                  className="w-full px-4 py-2 text-left hover:bg-gray-50 text-gray-700"
-                  onClick={() => {
-                    setLocation(item);
-                    setLocationFocused(false);
-                  }}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      <button
-        type="submit"
-        className={`flex items-center gap-2 bg-blue-600 text-white px-6 ${
-          variant === 'compact' ? 'py-1.5' : 'py-2'
-        } rounded-lg font-semibold hover:bg-blue-700 transition-colors ${
-          variant === 'compact' ? '' : 'shadow'
-        }`}
+    <div className="w-full max-w-4xl">
+      <form
+        className={`w-full flex flex-col md:flex-row gap-3 md:gap-0 bg-white rounded-xl ${
+          variant === 'compact' 
+            ? 'border border-gray-200' 
+            : 'shadow-lg'
+        } ${
+          variant === 'compact' ? 'p-1' : 'p-2'
+        } transition-all ${groupFocused ? "outline outline-2 outline-blue-500" : "outline outline-0"} ${className}`}
+        onSubmit={handleSearch}
       >
-        <FiSearch size={20} /> Buscar
-      </button>
-    </form>
+        <div className="flex-1 flex gap-4">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="¿Qué necesitas? Ej: fontanero, pintar habitación..."
+              className={`w-full px-4 ${
+                variant === 'compact' ? 'py-1.5' : 'py-2'
+              } rounded-l-lg md:rounded-l-xl border-none focus:outline-none text-gray-800 bg-transparent`}
+              value={search}
+              onChange={e => {
+                setSearch(e.target.value);
+                setError('');
+              }}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+            />
+            {searchFocused && searchSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
+                {searchSuggestions.map(({ item }) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`w-full px-4 py-2 text-left hover:bg-gray-50 ${
+                      item.isPrompt ? 'text-gray-400 italic' : 'text-gray-700'
+                    }`}
+                    onClick={() => !item.isPrompt && handleSearchSuggestionClick(
+                      item.profession,
+                      item.location,
+                      item.isGeneral,
+                      item.showAll
+                    )}
+                    disabled={item.isPrompt}
+                  >
+                    <div className="font-medium">{item.profession}</div>
+                    {!item.isPrompt && item.location && (
+                      <div className="text-sm text-gray-500">{item.location}</div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center bg-transparent border-l-2 border-gray-200 relative pl-4 md:w-[240px]">
+            <FiMapPin className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Tu ubicación"
+              className={`w-12 md:w-48 px-2 ${
+                variant === 'compact' ? 'py-1.5' : 'py-2'
+              } border-none focus:outline-none text-gray-800 bg-transparent rounded-r-lg`}
+              value={location}
+              onChange={e => {
+                setLocation(e.target.value);
+                setError('');
+              }}
+              onFocus={() => setLocationFocused(true)}
+              onBlur={() => setTimeout(() => setLocationFocused(false), 200)}
+            />
+            {locationSuggestions.length > 0 && locationFocused && (
+              <div className="absolute top-full right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50 w-full">
+                {locationSuggestions.map(({ item }) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className="w-full px-4 py-2 text-left hover:bg-gray-50 text-gray-700"
+                    onClick={() => {
+                      setLocation(item);
+                      setLocationFocused(false);
+                    }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <button
+          type="submit"
+          className={`flex items-center gap-2 bg-blue-600 text-white px-6 ${
+            variant === 'compact' ? 'py-1.5' : 'py-2'
+          } rounded-lg font-semibold hover:bg-blue-700 transition-colors ${
+            variant === 'compact' ? '' : 'shadow'
+          }`}
+        >
+          <FiSearch size={20} /> Buscar
+        </button>
+      </form>
+      {error && (
+        <div className="mt-2 text-center text-gray-400 text-sm">
+          {error}
+        </div>
+      )}
+    </div>
   );
 } 

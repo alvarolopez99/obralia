@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
 import ProfessionalCard from "@/components/ProfessionalCard";
-import { FiStar, FiTrendingUp, FiClock, FiX } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import { mockProfessionals } from "@/data/mockProfessionals";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -90,119 +90,40 @@ export default function SearchPage() {
   };
 
   // Función para calcular la similitud entre dos strings
-  const similarity = (str1: string, str2: string) => {
-    const longer = str1.length > str2.length ? str1 : str2;
-    const shorter = str1.length > str2.length ? str2 : str1;
-    if (longer.length === 0) return 1.0;
-    return (longer.length - editDistance(longer, shorter)) / longer.length;
-  };
-
-  // Función para calcular la distancia de edición
-  const editDistance = (str1: string, str2: string) => {
-    const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
-
-    for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
-    for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
-
-    for (let j = 1; j <= str2.length; j++) {
-      for (let i = 1; i <= str1.length; i++) {
-        const substitutionCost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-        matrix[j][i] = Math.min(
-          matrix[j][i - 1] + 1,
-          matrix[j - 1][i] + 1,
-          matrix[j - 1][i - 1] + substitutionCost
-        );
+  const calculateSimilarity = (str1: string, str2: string) => {
+    const s1 = str1.toLowerCase();
+    const s2 = str2.toLowerCase();
+    
+    // Si uno contiene al otro, es una buena coincidencia
+    if (s1.includes(s2) || s2.includes(s1)) return 0.8;
+    
+    // Si comparten más del 70% de caracteres, es una buena coincidencia
+    const longer = s1.length > s2.length ? s1 : s2;
+    const shorter = s1.length > s2.length ? s2 : s1;
+    const longerLength = longer.length;
+    
+    if (longerLength === 0) return 1.0;
+    
+    const editDistance = (str1: string, str2: string) => {
+      const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
+      for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
+      for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+      for (let j = 1; j <= str2.length; j++) {
+        for (let i = 1; i <= str1.length; i++) {
+          const substitutionCost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+          matrix[j][i] = Math.min(
+            matrix[j][i - 1] + 1,
+            matrix[j - 1][i] + 1,
+            matrix[j - 1][i - 1] + substitutionCost
+          );
+        }
       }
-    }
-    return matrix[str2.length][str1.length];
+      return matrix[str2.length][str1.length];
+    };
+
+    const distance = editDistance(s1, s2);
+    return 1 - (distance / longerLength);
   };
-
-  // Función para verificar si un término coincide con una profesión o categoría
-  const matchesTerm = (term: string, profession: string, category: string) => {
-    const termLower = term.toLowerCase();
-    const professionLower = profession.toLowerCase();
-    const categoryLower = category.toLowerCase();
-
-    // Si el término es muy corto, solo buscar coincidencias exactas
-    if (termLower.length < 3) {
-      return professionLower.includes(termLower) || categoryLower.includes(termLower);
-    }
-
-    // Si el término está contenido en la profesión o viceversa
-    if (professionLower.includes(termLower) || termLower.includes(professionLower)) {
-      return true;
-    }
-
-    // Calcular similitud directa
-    const directSimilarity = similarity(termLower, professionLower);
-    
-    // Calcular similitud ignorando la primera letra
-    const termWithoutFirst = termLower.slice(1);
-    const professionWithoutFirst = professionLower.slice(1);
-    const similarityWithoutFirst = similarity(termWithoutFirst, professionWithoutFirst);
-
-    // Calcular similitud ignorando la última letra
-    const termWithoutLast = termLower.slice(0, -1);
-    const professionWithoutLast = professionLower.slice(0, -1);
-    const similarityWithoutLast = similarity(termWithoutLast, professionWithoutLast);
-
-    // Retornar true si alguna de las condiciones se cumple
-    return directSimilarity > 0.5 || 
-           similarityWithoutFirst > 0.6 || 
-           similarityWithoutLast > 0.6;
-  };
-
-  // Obtener sugerencias basadas en el término de búsqueda
-  const getSuggestions = (searchTerm: string) => {
-    if (!searchTerm) return [];
-    
-    const searchLower = searchTerm.toLowerCase();
-    const searchWords = searchLower.split(/\s+/);
-    const firstWord = searchWords[0];
-    const location = searchWords.slice(1).join(' ');
-
-    console.log('Buscando sugerencias para:', firstWord);
-
-    // Primero intentar encontrar coincidencias exactas o similares
-    const exactMatches = mockProfessionals.filter(p => {
-      const professionLower = p.profession.toLowerCase();
-      return professionLower.includes(firstWord) || 
-             firstWord.includes(professionLower) ||
-             similarity(firstWord, professionLower) > 0.5;
-    });
-
-    console.log('Coincidencias exactas encontradas:', exactMatches.length);
-
-    // Si no hay coincidencias exactas, mostrar "Todos los profesionales"
-    if (exactMatches.length === 0) {
-      console.log('No hay coincidencias, mostrando "Todos los profesionales"');
-      return [`Todos los profesionales${location ? ` - ${location}` : ''}`];
-    }
-
-    // Obtener sugerencias de profesiones
-    const professionSuggestions = exactMatches
-      .map(p => p.profession)
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .slice(0, 5);
-
-    console.log('Sugerencias encontradas:', professionSuggestions);
-
-    const suggestions = professionSuggestions.map(s => 
-      `${s}${location ? ` - ${location}` : ''}`
-    );
-
-    console.log('Sugerencias finales:', suggestions);
-    return suggestions;
-  };
-
-  // Actualizar sugerencias cuando cambia la búsqueda
-  useEffect(() => {
-    if (search && search !== 'Todos los profesionales') {
-      console.log('Actualizando sugerencias para:', search);
-      const newSuggestions = getSuggestions(search);
-      console.log('Nuevas sugerencias:', newSuggestions);
-    }
-  }, [search]);
 
   // Filtrar profesionales
   const filteredProfessionals = useMemo(() => {
@@ -210,15 +131,11 @@ export default function SearchPage() {
 
     // Si hay búsqueda y no es "Todos los profesionales", filtrar por profesión
     if (search && search !== 'Todos los profesionales') {
-      const searchLower = search.toLowerCase();
-      filtered = filtered.filter(professional => 
-        matchesTerm(searchLower, professional.profession, professional.category)
-      );
-
-      // Si no hay resultados, mostrar todos
-      if (filtered.length === 0) {
-        filtered = mockProfessionals;
-      }
+      const searchTerm = search.toLowerCase().trim();
+      filtered = filtered.filter(professional => {
+        const similarity = calculateSimilarity(searchTerm, professional.profession);
+        return similarity > 0.7; // Umbral de similitud
+      });
     }
 
     // Filtrar por categoría si está seleccionada

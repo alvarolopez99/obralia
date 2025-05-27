@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { mockProfessionals } from "@/data/mockProfessionals";
-import { FiStar, FiMapPin, FiCheckCircle, FiClock, FiCalendar, FiMessageSquare, FiPhone } from "react-icons/fi";
+import { FiMapPin, FiCheckCircle, FiCalendar, FiMessageSquare } from "react-icons/fi";
 import { AiFillStar } from "react-icons/ai";
 import Image from "next/image";
 import Link from "next/link";
