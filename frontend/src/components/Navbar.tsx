@@ -2,41 +2,56 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FiHome, FiUsers, FiGrid, FiInfo, FiMail, FiLogIn } from 'react-icons/fi';
-
-const navLinks = [
-  { href: '/como-funciona', label: 'Cómo Funciona', icon: <FiInfo size={20} /> },
-  { href: '/contacto', label: 'Contacto', icon: <FiMail size={20} /> },
-];
+import { usePathname } from 'next/navigation';
+import { FiGrid, FiLogIn, FiInfo, FiMail } from 'react-icons/fi';
+import SmartSearch from './SmartSearch';
+import { mockProfessionals } from '@/data/mockProfessionals';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const isSearchPage = pathname.startsWith('/search');
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-30">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-blue-600">
+          <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-blue-600 shrink-0">
             <FiGrid size={28} className="text-blue-600" />
             Obralia
           </Link>
 
+          {/* Search Bar - Only visible on search page */}
+          {isSearchPage && (
+            <div className="flex-1 max-w-2xl">
+              <SmartSearch professionals={mockProfessionals} variant="compact" />
+            </div>
+          )}
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors font-medium"
-              >
-                {link.icon}
-                <span className="hidden sm:inline">{link.label}</span>
-              </Link>
-            ))}
+          <div className="hidden md:flex items-center gap-4">
+            {!isSearchPage && (
+              <>
+                <Link
+                  href="como-funciona"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors font-semibold"
+                >
+                  <FiInfo size={18} />
+                  <span>Cómo funciona</span>
+                </Link>
+                <Link
+                  href="contacto"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors font-semibold"
+                >
+                  <FiMail size={18} />
+                  <span>Contacto</span>
+                </Link>
+              </>
+            )}
             <Link
               href="/login"
-              className="ml-4 flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors font-semibold"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors font-semibold"
             >
               <FiLogIn size={18} />
               <span className="hidden sm:inline">Iniciar Sesión</span>
@@ -71,24 +86,39 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.icon}
-                  {link.label}
-                </Link>
-              ))}
+              {!isSearchPage && (
+                <>
+                  <Link
+                    href="#como-funciona"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors font-semibold"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <FiInfo size={18} />
+                    Cómo funciona
+                  </Link>
+                  <Link
+                    href="#contacto"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg border border-gray-300 text-gray-400 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors font-semibold"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <FiMail size={18} />
+                    Contacto
+                  </Link>
+                </>
+              )}
               <Link
                 href="/login"
                 className="flex items-center gap-2 px-4 py-3 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors font-semibold"
+                onClick={() => setIsMenuOpen(false)}
               >
                 <FiLogIn size={18} />
                 Iniciar Sesión
               </Link>
+              {isSearchPage && (
+                <div className="mt-4 px-2">
+                  <SmartSearch professionals={mockProfessionals} variant="compact" />
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -3,8 +3,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import ProfessionalCard from "@/components/ProfessionalCard";
 import { FiStar, FiTrendingUp, FiClock, FiX } from "react-icons/fi";
 import { mockProfessionals } from "@/data/mockProfessionals";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Fuse from 'fuse.js';
 
 const categoryNames: { [key: string]: string } = {
   fontaneria: 'Fontanería',
@@ -24,9 +25,27 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const location = searchParams.get("location");
+  const search = searchParams.get("search");
   const [sortBy, setSortBy] = useState<SortOption>('recommended');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Configuración de Fuse.js para búsqueda fuzzy
+  const fuse = new Fuse(mockProfessionals, {
+    keys: [
+      { name: 'name', weight: 2 },
+      { name: 'profession', weight: 2 },
+      { name: 'category', weight: 1.5 },
+      { name: 'location', weight: 1 }
+    ],
+    threshold: 0.4,
+    includeScore: true,
+    shouldSort: true,
+    minMatchCharLength: 2,
+    location: 0,
+    distance: 100,
+    useExtendedSearch: true
+  });
 
   // Efecto para cerrar el dropdown cuando se hace clic fuera
   useEffect(() => {
@@ -70,15 +89,167 @@ export default function SearchPage() {
     updateCategories(newCategories);
   };
 
-  // Filtrar profesionales según los parámetros
-  let filteredProfessionals = mockProfessionals.filter((pro) => {
-    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(pro.category);
-    const matchesLocation = !location || pro.location.toLowerCase().includes(location.toLowerCase());
-    return matchesCategory && matchesLocation;
-  });
+  // Función para calcular la similitud entre dos strings
+  const similarity = (str1: string, str2: string) => {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    if (longer.length === 0) return 1.0;
+    return (longer.length - editDistance(longer, shorter)) / longer.length;
+  };
+
+  // Función para calcular la distancia de edición
+  const editDistance = (str1: string, str2: string) => {
+    const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
+
+    for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+
+    for (let j = 1; j <= str2.length; j++) {
+      for (let i = 1; i <= str1.length; i++) {
+        const substitutionCost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[j][i] = Math.min(
+          matrix[j][i - 1] + 1,
+          matrix[j - 1][i] + 1,
+          matrix[j - 1][i - 1] + substitutionCost
+        );
+      }
+    }
+    return matrix[str2.length][str1.length];
+  };
+
+  // Función para verificar si un término coincide con una profesión o categoría
+  const matchesTerm = (term: string, profession: string, category: string) => {
+    const termLower = term.toLowerCase();
+    const professionLower = profession.toLowerCase();
+    const categoryLower = category.toLowerCase();
+
+    // Si el término es muy corto, solo buscar coincidencias exactas
+    if (termLower.length < 3) {
+      return professionLower.includes(termLower) || categoryLower.includes(termLower);
+    }
+
+    // Si el término está contenido en la profesión o viceversa
+    if (professionLower.includes(termLower) || termLower.includes(professionLower)) {
+      return true;
+    }
+
+    // Calcular similitud directa
+    const directSimilarity = similarity(termLower, professionLower);
+    
+    // Calcular similitud ignorando la primera letra
+    const termWithoutFirst = termLower.slice(1);
+    const professionWithoutFirst = professionLower.slice(1);
+    const similarityWithoutFirst = similarity(termWithoutFirst, professionWithoutFirst);
+
+    // Calcular similitud ignorando la última letra
+    const termWithoutLast = termLower.slice(0, -1);
+    const professionWithoutLast = professionLower.slice(0, -1);
+    const similarityWithoutLast = similarity(termWithoutLast, professionWithoutLast);
+
+    // Retornar true si alguna de las condiciones se cumple
+    return directSimilarity > 0.5 || 
+           similarityWithoutFirst > 0.6 || 
+           similarityWithoutLast > 0.6;
+  };
+
+  // Obtener sugerencias basadas en el término de búsqueda
+  const getSuggestions = (searchTerm: string) => {
+    if (!searchTerm) return [];
+    
+    const searchLower = searchTerm.toLowerCase();
+    const searchWords = searchLower.split(/\s+/);
+    const firstWord = searchWords[0];
+    const location = searchWords.slice(1).join(' ');
+
+    console.log('Buscando sugerencias para:', firstWord);
+
+    // Primero intentar encontrar coincidencias exactas o similares
+    const exactMatches = mockProfessionals.filter(p => {
+      const professionLower = p.profession.toLowerCase();
+      return professionLower.includes(firstWord) || 
+             firstWord.includes(professionLower) ||
+             similarity(firstWord, professionLower) > 0.5;
+    });
+
+    console.log('Coincidencias exactas encontradas:', exactMatches.length);
+
+    // Si no hay coincidencias exactas, mostrar "Todos los profesionales"
+    if (exactMatches.length === 0) {
+      console.log('No hay coincidencias, mostrando "Todos los profesionales"');
+      return [`Todos los profesionales${location ? ` - ${location}` : ''}`];
+    }
+
+    // Obtener sugerencias de profesiones
+    const professionSuggestions = exactMatches
+      .map(p => p.profession)
+      .filter((value, index, self) => self.indexOf(value) === index)
+      .slice(0, 5);
+
+    console.log('Sugerencias encontradas:', professionSuggestions);
+
+    const suggestions = professionSuggestions.map(s => 
+      `${s}${location ? ` - ${location}` : ''}`
+    );
+
+    console.log('Sugerencias finales:', suggestions);
+    return suggestions;
+  };
+
+  // Actualizar sugerencias cuando cambia la búsqueda
+  useEffect(() => {
+    if (search && search !== 'Todos los profesionales') {
+      console.log('Actualizando sugerencias para:', search);
+      const newSuggestions = getSuggestions(search);
+      console.log('Nuevas sugerencias:', newSuggestions);
+    }
+  }, [search]);
+
+  // Filtrar profesionales
+  const filteredProfessionals = useMemo(() => {
+    let filtered = mockProfessionals;
+
+    // Si hay búsqueda y no es "Todos los profesionales", filtrar por profesión
+    if (search && search !== 'Todos los profesionales') {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(professional => 
+        matchesTerm(searchLower, professional.profession, professional.category)
+      );
+
+      // Si no hay resultados, mostrar todos
+      if (filtered.length === 0) {
+        filtered = mockProfessionals;
+      }
+    }
+
+    // Filtrar por categoría si está seleccionada
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(professional => selectedCategories.includes(professional.category));
+    }
+
+    // Filtrar por ubicación si está seleccionada
+    if (location) {
+      const locationLower = location.toLowerCase();
+      filtered = filtered.filter(professional => {
+        const professionalLocation = professional.location.toLowerCase();
+        return professionalLocation === locationLower || 
+               professionalLocation.includes(locationLower);
+      });
+    }
+
+    return filtered;
+  }, [search, selectedCategories, location]);
+
+  // Efecto para actualizar la URL cuando no hay resultados
+  useEffect(() => {
+    if (search && search !== 'Todos los profesionales' && filteredProfessionals.length === mockProfessionals.length) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("search", "Todos los profesionales");
+      router.push(`/search?${params.toString()}`);
+    }
+  }, [search, filteredProfessionals.length, router, searchParams, mockProfessionals.length]);
 
   // Ordenar profesionales según el criterio seleccionado
-  filteredProfessionals = [...filteredProfessionals].sort((a, b) => {
+  const sortedProfessionals = [...filteredProfessionals].sort((a, b) => {
     switch (sortBy) {
       case 'rating':
         return b.rating - a.rating;
@@ -98,11 +269,13 @@ export default function SearchPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {selectedCategories.length === 0 
-              ? 'Mostrando todos los profesionales del sector'
-              : selectedCategories.length === 1
-                ? `Mostrando profesionales de ${categoryNames[selectedCategories[0]]}`
-                : `Mostrando profesionales de ${selectedCategories.length} categorías`
+            {search
+              ? `Resultados para "${search}"`
+              : selectedCategories.length === 0 
+                ? 'Mostrando todos los profesionales del sector'
+                : selectedCategories.length === 1
+                  ? `Mostrando profesionales de ${categoryNames[selectedCategories[0]]}`
+                  : `Mostrando profesionales de ${selectedCategories.length} categorías`
             }
           </h1>
           {location && (
@@ -219,8 +392,8 @@ export default function SearchPage() {
 
         {/* Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProfessionals.length > 0 ? (
-            filteredProfessionals.map((pro) => (
+          {sortedProfessionals.length > 0 ? (
+            sortedProfessionals.map((pro) => (
               <ProfessionalCard 
                 key={pro.id}
                 id={pro.id.toString()}
@@ -237,8 +410,20 @@ export default function SearchPage() {
           ) : (
             <div className="col-span-full text-center py-12">
               <p className="text-gray-600 text-lg">
-                No se encontraron profesionales que coincidan con tu búsqueda.
+                {search
+                  ? `No se encontraron resultados para "${search}". Intenta con otros términos o revisa la ortografía.`
+                  : "No se encontraron profesionales que coincidan con tu búsqueda."}
               </p>
+              {search && (
+                <div className="mt-4">
+                  <p className="text-gray-500 mb-2">Sugerencias:</p>
+                  <ul className="text-gray-600">
+                    <li>• Verifica la ortografía de las palabras</li>
+                    <li>• Intenta con términos más generales</li>
+                    <li>• Prueba con sinónimos</li>
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -194,9 +194,9 @@ export default function ProfessionalPage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Reseñas de clientes</h2>
               <div className="space-y-6" ref={reviewsContainerRef}>
                 <AnimatePresence>
-                  {professional.reviewsList && professional.reviewsList
-                    .slice(0, reviewsToShow)
-                    .map((review: import('@/types/professional').ProfessionalReview, idx: number) => (
+                {professional.reviewsList && professional.reviewsList
+                  .slice(0, reviewsToShow)
+                  .map((review: import('@/types/professional').ProfessionalReview, idx: number) => (
                       <motion.div
                         key={idx}
                         initial={{ opacity: 0 }}
@@ -211,21 +211,21 @@ export default function ProfessionalPage() {
                           exit={{ y: -20 }}
                           transition={{ duration: 0.2, delay: 0.05 }}
                         >
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex items-center gap-1">
-                              {[1,2,3,4,5].map(i => i <= review.rating ? (
-                                <span key={i} className="text-yellow-400">★</span>
-                              ) : (
-                                <span key={i} className="text-gray-300">★</span>
-                              ))}
-                            </div>
-                            <span className="text-gray-500">{review.date}</span>
-                            <span className="ml-2 text-gray-700 font-semibold">{review.author}</span>
-                          </div>
-                          <p className="text-gray-600">{review.text}</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-1">
+                          {[1,2,3,4,5].map(i => i <= review.rating ? (
+                            <span key={i} className="text-yellow-400">★</span>
+                          ) : (
+                            <span key={i} className="text-gray-300">★</span>
+                          ))}
+                        </div>
+                        <span className="text-gray-500">{review.date}</span>
+                        <span className="ml-2 text-gray-700 font-semibold">{review.author}</span>
+                      </div>
+                      <p className="text-gray-600">{review.text}</p>
                         </motion.div>
                       </motion.div>
-                    ))}
+                  ))}
                 </AnimatePresence>
                 {professional.reviewsList && professional.reviewsList.length > 3 && (
                   <motion.button
@@ -246,7 +246,7 @@ export default function ProfessionalPage() {
                         }
                         // Esperamos a que termine el scroll antes de actualizar el estado
                         setTimeout(() => {
-                          setReviewsToShow(3);
+                        setReviewsToShow(3);
                         }, 300);
                       } else {
                         // Si estamos expandiendo, simplemente actualizamos el estado
