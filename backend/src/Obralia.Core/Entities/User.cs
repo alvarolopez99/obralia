@@ -8,13 +8,14 @@ public class User : BaseEntity
     [EmailAddress]
     public string Email { get; set; } = null!;
 
-    public string? PasswordHash { get; set; }
+    [Required]
+    public string Name { get; set; } = null!;
 
     [Required]
-    public string FirstName { get; set; } = null!;
+    public string PasswordHash { get; set; } = null!;
 
     [Required]
-    public string LastName { get; set; } = null!;
+    public string UserType { get; set; } = "client"; // "client" o "professional"
 
     public string? PhoneNumber { get; set; }
 

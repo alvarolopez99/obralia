@@ -16,36 +16,13 @@ namespace Obralia.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Icon = table.Column<string>(type: "text", nullable: true),
-                    ParentCategoryId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Icon = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Categories_Categories_ParentCategoryId",
-                        column: x => x.ParentCategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Skills",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Skills", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -54,9 +31,9 @@ namespace Obralia.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    FirstName = table.Column<string>(type: "text", nullable: false),
-                    LastName = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    UserType = table.Column<string>(type: "text", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     ProfilePictureUrl = table.Column<string>(type: "text", nullable: true),
                     IsProfessional = table.Column<bool>(type: "boolean", nullable: false),
@@ -77,7 +54,6 @@ namespace Obralia.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProfessionalId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId1 = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -96,15 +72,10 @@ namespace Obralia.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Favorites_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "PortfolioItems",
+                name: "PortfolioItem",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -119,9 +90,9 @@ namespace Obralia.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PortfolioItems", x => x.Id);
+                    table.PrimaryKey("PK_PortfolioItem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PortfolioItems_Users_UserId",
+                        name: "FK_PortfolioItem_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -134,9 +105,18 @@ namespace Obralia.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Bio = table.Column<string>(type: "text", nullable: true),
-                    CompanyName = table.Column<string>(type: "text", nullable: true),
-                    Website = table.Column<string>(type: "text", nullable: true),
+                    Bio = table.Column<string>(type: "text", nullable: false),
+                    IsVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    ProfilePictureUrl = table.Column<string>(type: "text", nullable: true),
+                    CoverImageUrl = table.Column<string>(type: "text", nullable: true),
+                    WebsiteUrl = table.Column<string>(type: "text", nullable: true),
+                    FacebookUrl = table.Column<string>(type: "text", nullable: true),
+                    InstagramUrl = table.Column<string>(type: "text", nullable: true),
+                    TwitterUrl = table.Column<string>(type: "text", nullable: true),
+                    LinkedInUrl = table.Column<string>(type: "text", nullable: true),
+                    YouTubeUrl = table.Column<string>(type: "text", nullable: true),
+                    TikTokUrl = table.Column<string>(type: "text", nullable: true),
                     Address = table.Column<string>(type: "text", nullable: true),
                     City = table.Column<string>(type: "text", nullable: true),
                     State = table.Column<string>(type: "text", nullable: true),
@@ -161,42 +141,7 @@ namespace Obralia.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Reviews",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProfessionalId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Rating = table.Column<int>(type: "integer", nullable: false),
-                    Comment = table.Column<string>(type: "text", nullable: true),
-                    UserId1 = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reviews", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Reviews_Users_ProfessionalId",
-                        column: x => x.ProfessionalId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Reviews_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Reviews_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Services",
+                name: "Service",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -211,11 +156,35 @@ namespace Obralia.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Services", x => x.Id);
+                    table.PrimaryKey("PK_Service", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Services_Users_UserId",
+                        name: "FK_Service_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CategoryProfessionalProfile",
+                columns: table => new
+                {
+                    CategoriesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProfessionalsId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryProfessionalProfile", x => new { x.CategoriesId, x.ProfessionalsId });
+                    table.ForeignKey(
+                        name: "FK_CategoryProfessionalProfile_Categories_CategoriesId",
+                        column: x => x.CategoriesId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryProfessionalProfile_ProfessionalProfiles_Profession~",
+                        column: x => x.ProfessionalsId,
+                        principalTable: "ProfessionalProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -225,82 +194,94 @@ namespace Obralia.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProfessionalProfileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProfessionalId = table.Column<Guid>(type: "uuid", nullable: false),
                     DayOfWeek = table.Column<int>(type: "integer", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "interval", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "interval", nullable: false),
                     IsAvailable = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    Notes = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProfessionalAvailabilities", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ProfessionalAvailabilities_ProfessionalProfiles_Professiona~",
-                        column: x => x.ProfessionalProfileId,
+                        column: x => x.ProfessionalId,
                         principalTable: "ProfessionalProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProfessionalCategories",
+                name: "ProfessionalBookings",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProfessionalProfileId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProfessionalId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    Location = table.Column<string>(type: "text", nullable: true),
+                    Price = table.Column<decimal>(type: "numeric", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProfessionalCategories", x => x.Id);
+                    table.PrimaryKey("PK_ProfessionalBookings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProfessionalCategories_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        name: "FK_ProfessionalBookings_ProfessionalProfiles_ProfessionalId",
+                        column: x => x.ProfessionalId,
+                        principalTable: "ProfessionalProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProfessionalCategories_ProfessionalProfiles_ProfessionalPro~",
-                        column: x => x.ProfessionalProfileId,
-                        principalTable: "ProfessionalProfiles",
+                        name: "FK_ProfessionalBookings_Users_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProfessionalSkills",
+                name: "Reviews",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProfessionalProfileId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SkillId = table.Column<Guid>(type: "uuid", nullable: false),
-                    YearsOfExperience = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProfessionalId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Rating = table.Column<int>(type: "integer", nullable: false),
+                    Comment = table.Column<string>(type: "text", nullable: true),
+                    ProfessionalProfileId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProfessionalSkills", x => x.Id);
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProfessionalSkills_ProfessionalProfiles_ProfessionalProfile~",
+                        name: "FK_Reviews_ProfessionalProfiles_ProfessionalProfileId",
                         column: x => x.ProfessionalProfileId,
                         principalTable: "ProfessionalProfiles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ProfessionalSkills_Skills_SkillId",
-                        column: x => x.SkillId,
-                        principalTable: "Skills",
+                        name: "FK_Reviews_Users_ProfessionalId",
+                        column: x => x.ProfessionalId,
+                        principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceCategories",
+                name: "ServiceCategory",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -311,25 +292,25 @@ namespace Obralia.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceCategories", x => x.Id);
+                    table.PrimaryKey("PK_ServiceCategory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ServiceCategories_Categories_CategoryId",
+                        name: "FK_ServiceCategory_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ServiceCategories_Services_ServiceId",
+                        name: "FK_ServiceCategory_Service_ServiceId",
                         column: x => x.ServiceId,
-                        principalTable: "Services",
+                        principalTable: "Service",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_ParentCategoryId",
-                table: "Categories",
-                column: "ParentCategoryId");
+                name: "IX_CategoryProfessionalProfile_ProfessionalsId",
+                table: "CategoryProfessionalProfile",
+                column: "ProfessionalsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Favorites_ProfessionalId",
@@ -342,29 +323,24 @@ namespace Obralia.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Favorites_UserId1",
-                table: "Favorites",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PortfolioItems_UserId",
-                table: "PortfolioItems",
+                name: "IX_PortfolioItem_UserId",
+                table: "PortfolioItem",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProfessionalAvailabilities_ProfessionalProfileId",
+                name: "IX_ProfessionalAvailabilities_ProfessionalId",
                 table: "ProfessionalAvailabilities",
-                column: "ProfessionalProfileId");
+                column: "ProfessionalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProfessionalCategories_CategoryId",
-                table: "ProfessionalCategories",
-                column: "CategoryId");
+                name: "IX_ProfessionalBookings_ClientId",
+                table: "ProfessionalBookings",
+                column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProfessionalCategories_ProfessionalProfileId",
-                table: "ProfessionalCategories",
-                column: "ProfessionalProfileId");
+                name: "IX_ProfessionalBookings_ProfessionalId",
+                table: "ProfessionalBookings",
+                column: "ProfessionalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProfessionalProfiles_UserId",
@@ -373,19 +349,14 @@ namespace Obralia.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProfessionalSkills_ProfessionalProfileId",
-                table: "ProfessionalSkills",
-                column: "ProfessionalProfileId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProfessionalSkills_SkillId",
-                table: "ProfessionalSkills",
-                column: "SkillId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_ProfessionalId",
                 table: "Reviews",
                 column: "ProfessionalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ProfessionalProfileId",
+                table: "Reviews",
+                column: "ProfessionalProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_UserId",
@@ -393,61 +364,59 @@ namespace Obralia.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_UserId1",
-                table: "Reviews",
-                column: "UserId1");
+                name: "IX_Service_UserId",
+                table: "Service",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceCategories_CategoryId",
-                table: "ServiceCategories",
+                name: "IX_ServiceCategory_CategoryId",
+                table: "ServiceCategory",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceCategories_ServiceId",
-                table: "ServiceCategories",
+                name: "IX_ServiceCategory_ServiceId",
+                table: "ServiceCategory",
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Services_UserId",
-                table: "Services",
-                column: "UserId");
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CategoryProfessionalProfile");
+
+            migrationBuilder.DropTable(
                 name: "Favorites");
 
             migrationBuilder.DropTable(
-                name: "PortfolioItems");
+                name: "PortfolioItem");
 
             migrationBuilder.DropTable(
                 name: "ProfessionalAvailabilities");
 
             migrationBuilder.DropTable(
-                name: "ProfessionalCategories");
-
-            migrationBuilder.DropTable(
-                name: "ProfessionalSkills");
+                name: "ProfessionalBookings");
 
             migrationBuilder.DropTable(
                 name: "Reviews");
 
             migrationBuilder.DropTable(
-                name: "ServiceCategories");
+                name: "ServiceCategory");
 
             migrationBuilder.DropTable(
                 name: "ProfessionalProfiles");
 
             migrationBuilder.DropTable(
-                name: "Skills");
-
-            migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Services");
+                name: "Service");
 
             migrationBuilder.DropTable(
                 name: "Users");

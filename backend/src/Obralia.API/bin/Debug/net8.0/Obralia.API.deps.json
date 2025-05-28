@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v8.0": {
       "Obralia.API/1.0.0": {
         "dependencies": {
+          "BCrypt.Net-Next": "4.0.3",
           "Microsoft.AspNetCore.OpenApi": "8.0.12",
           "Microsoft.EntityFrameworkCore.Design": "8.0.2",
           "Obralia.Core": "1.0.0",

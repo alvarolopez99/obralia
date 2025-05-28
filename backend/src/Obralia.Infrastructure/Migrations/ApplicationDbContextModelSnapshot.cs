@@ -211,22 +211,29 @@ namespace Obralia.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Bio")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("City")
                         .HasColumnType("text");
 
-                    b.Property<string>("CompanyName")
+                    b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<string>("Country")
+                    b.Property<string>("CoverImageUrl")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("FacebookUrl")
+                        .HasColumnType("text");
+
                     b.Property<decimal?>("HourlyRate")
                         .HasColumnType("numeric");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -240,13 +247,25 @@ namespace Obralia.Infrastructure.Migrations
                     b.Property<double?>("Latitude")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("LinkedInUrl")
+                        .HasColumnType("text");
+
                     b.Property<double?>("Longitude")
                         .HasColumnType("double precision");
 
                     b.Property<string>("PostalCode")
                         .HasColumnType("text");
 
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("text");
+
                     b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TikTokUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TwitterUrl")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -255,7 +274,10 @@ namespace Obralia.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Website")
+                    b.Property<string>("WebsiteUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("YouTubeUrl")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -382,10 +404,6 @@ namespace Obralia.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("GoogleId")
                         .HasColumnType("text");
 
@@ -395,11 +413,12 @@ namespace Obralia.Infrastructure.Migrations
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("LastName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
@@ -411,7 +430,14 @@ namespace Obralia.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

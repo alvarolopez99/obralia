@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Obralia.Core.Entities;
+using Obralia.Infrastructure.Data;
 
 namespace Obralia.Infrastructure.Data;
 
@@ -36,18 +37,23 @@ public static class SeedData
         // Seed Users
         if (!await context.Users.AnyAsync())
         {
-            var users = new List<User>
+            var adminUser = new User
             {
-                new User
-                {
-                    Email = "test@example.com",
-                    FirstName = "Test",
-                    LastName = "User",
-                    IsProfessional = true
-                }
+                Email = "admin@obralia.com",
+                Name = "Admin",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                UserType = "professional"
             };
 
-            await context.Users.AddRangeAsync(users);
+            var clientUser = new User
+            {
+                Email = "client@obralia.com",
+                Name = "Cliente",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Client123!"),
+                UserType = "client"
+            };
+
+            await context.Users.AddRangeAsync(adminUser, clientUser);
             await context.SaveChangesAsync();
         }
 

@@ -11,26 +11,52 @@ public class ProfessionalProfile : BaseEntity
     [ForeignKey("UserId")]
     public User User { get; set; } = null!;
 
-    public string? Bio { get; set; }
-    public string? CompanyName { get; set; }
-    public string? Website { get; set; }
-    public string? Address { get; set; }
-    public string? City { get; set; }
-    public string? State { get; set; }
-    public string? Country { get; set; }
-    public string? PostalCode { get; set; }
-    public double? Latitude { get; set; }
-    public double? Longitude { get; set; }
-    public decimal? HourlyRate { get; set; }
-    public bool IsAvailable { get; set; }
+    [Required]
+    public string Bio { get; set; } = null!;
+
     public bool IsVerified { get; set; }
-    public bool IsActive { get; set; } = true;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
+
+    public bool IsActive { get; set; }
+
+    public string? ProfilePictureUrl { get; set; }
+
+    public string? CoverImageUrl { get; set; }
+
+    public string? WebsiteUrl { get; set; }
+
+    public string? FacebookUrl { get; set; }
+
+    public string? InstagramUrl { get; set; }
+
+    public string? TwitterUrl { get; set; }
+
+    public string? LinkedInUrl { get; set; }
+
+    public string? YouTubeUrl { get; set; }
+
+    public string? TikTokUrl { get; set; }
+
+    public string? Address { get; set; }
+
+    public string? City { get; set; }
+
+    public string? State { get; set; }
+
+    public string? Country { get; set; }
+
+    public string? PostalCode { get; set; }
+
+    public double? Latitude { get; set; }
+
+    public double? Longitude { get; set; }
+
+    public decimal? HourlyRate { get; set; }
+
+    public bool IsAvailable { get; set; }
 
     // Navigation properties
-    public ICollection<Category> Categories { get; set; } = new List<Category>();
-    public ICollection<ProfessionalAvailability> Availabilities { get; set; } = new List<ProfessionalAvailability>();
-    public ICollection<ProfessionalBooking> Bookings { get; set; } = new List<ProfessionalBooking>();
+    public List<Category> Categories { get; set; } = new();
+    public List<ProfessionalAvailability> Availabilities { get; set; } = new();
+    public List<ProfessionalBooking> Bookings { get; set; } = new();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 } 

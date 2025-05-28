@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Obralia.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ca770191e3b29b322390737b7ffc6d4c3e77ff01")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d704c61664c9efaff18d2608a0590b63f2bd370")]
 [assembly: System.Reflection.AssemblyProductAttribute("Obralia.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Obralia.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

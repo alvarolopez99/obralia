@@ -23,10 +23,10 @@ public class RegisterRequest
     public string Password { get; set; } = null!;
 
     [Required]
-    public string FirstName { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     [Required]
-    public string LastName { get; set; } = null!;
+    public string UserType { get; set; } = "client";
 }
 
 public class GoogleLoginRequest
