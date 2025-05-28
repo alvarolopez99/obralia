@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Obralia.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d704c61664c9efaff18d2608a0590b63f2bd370")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2a3358b0e7612fac2f683dae500ca764ae473170")]
 [assembly: System.Reflection.AssemblyProductAttribute("Obralia.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Obralia.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

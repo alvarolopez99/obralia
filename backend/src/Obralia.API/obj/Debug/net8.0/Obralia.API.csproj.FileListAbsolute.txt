@@ -118,3 +118,5 @@
 /Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.API/bin/Debug/net8.0/tr/Microsoft.CodeAnalysis.Workspaces.resources.dll
 /Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.API/bin/Debug/net8.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.resources.dll
 /Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.API/bin/Debug/net8.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.API/bin/Debug/net8.0/Obralia.Domain.dll
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.API/bin/Debug/net8.0/Obralia.Domain.pdb

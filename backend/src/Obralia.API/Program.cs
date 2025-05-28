@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Obralia.Core.Interfaces;
 using Obralia.Infrastructure.Services;
 using Obralia.Infrastructure.Data;
 using System.Net;

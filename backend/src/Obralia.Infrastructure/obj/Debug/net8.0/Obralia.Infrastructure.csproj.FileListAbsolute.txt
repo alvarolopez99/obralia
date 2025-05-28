@@ -16,3 +16,5 @@
 /Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Infrastructure/obj/Debug/net8.0/Obralia.Infrastructure.pdb
 /Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Infrastructure/obj/Debug/net8.0/Obralia.Infrastructure.genruntimeconfig.cache
 /Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Infrastructure/obj/Debug/net8.0/ref/Obralia.Infrastructure.dll
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Infrastructure/bin/Debug/net8.0/Obralia.Domain.dll
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Infrastructure/bin/Debug/net8.0/Obralia.Domain.pdb

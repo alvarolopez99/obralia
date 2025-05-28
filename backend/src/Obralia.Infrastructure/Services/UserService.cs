@@ -1,12 +1,25 @@
 using Microsoft.EntityFrameworkCore;
-using Obralia.Core.DTOs;
-using Obralia.Core.Entities;
-using Obralia.Core.Interfaces;
+using Obralia.Domain.Models;
 using Obralia.Infrastructure.Data;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Obralia.Infrastructure.Services;
+
+public interface IUserService
+{
+    Task<User> CreateUserAsync(User user);
+    Task<User?> GetUserByIdAsync(Guid id);
+    Task<User?> GetUserByEmailAsync(string email);
+    Task<IEnumerable<User>> GetAllUsersAsync();
+    Task<IEnumerable<User>> GetProfessionalsAsync();
+    Task<User> UpdateUserAsync(User user);
+    Task DeleteUserAsync(Guid id);
+    Task<User> CreateProfessionalProfileAsync(User user, ProfessionalProfile profile);
+    Task<User?> LoginAsync(string email, string password);
+    Task<User> RegisterAsync(string email, string password, string name, UserRole role);
+    Task<bool> IsEmailAvailableAsync(string email);
+    Task<User> UpdateProfileAsync(Guid id, string name, string? phoneNumber, string? profilePictureUrl);
+    Task<User> ConvertToProfessionalAsync(Guid id);
+}
 
 public class UserService : IUserService
 {
@@ -17,17 +30,28 @@ public class UserService : IUserService
         _context = context;
     }
 
-    public async Task<User?> GetByIdAsync(Guid id)
+    public async Task<User> CreateUserAsync(User user)
+    {
+        user.CreatedAt = DateTime.UtcNow;
+        user.UpdatedAt = DateTime.UtcNow;
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task<User?> GetUserByIdAsync(Guid id)
     {
         return await _context.Users
             .Include(u => u.ProfessionalProfile)
+            .Include(u => u.ClientProfile)
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
         return await _context.Users
             .Include(u => u.ProfessionalProfile)
+            .Include(u => u.ClientProfile)
             .FirstOrDefaultAsync(u => u.Email == email);
     }
 
@@ -45,32 +69,18 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<User> RegisterAsync(string email, string password, string name, string userType)
+    public async Task<User> RegisterAsync(string email, string password, string name, UserRole role)
     {
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Email = email,
             Name = name,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-            UserType = userType,
-            IsProfessional = userType == "professional"
-        };
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        return user;
-    }
-
-    public async Task<User> RegisterWithGoogleAsync(string email, string googleId, string firstName, string lastName)
-    {
-        var user = new User
-        {
-            Email = email,
-            Name = $"{firstName} {lastName}",
-            GoogleId = googleId,
-            UserType = "client",
-            IsVerified = true
+            Role = role,
+            IsProfessional = role == UserRole.Professional,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         _context.Users.Add(user);
@@ -84,22 +94,12 @@ public class UserService : IUserService
         return !await _context.Users.AnyAsync(u => u.Email == email);
     }
 
-    public async Task<bool> IsGoogleIdAvailableAsync(string googleId)
+    public async Task<User> UpdateUserAsync(User user)
     {
-        return !await _context.Users.AnyAsync(u => u.GoogleId == googleId);
-    }
-
-    public async Task<User?> GetByGoogleIdAsync(string googleId)
-    {
-        return await _context.Users
-            .Include(u => u.ProfessionalProfile)
-            .FirstOrDefaultAsync(u => u.GoogleId == googleId);
-    }
-
-    public async Task UpdateUserAsync(User user)
-    {
+        user.UpdatedAt = DateTime.UtcNow;
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
+        return user;
     }
 
     public async Task DeleteUserAsync(Guid id)
@@ -116,6 +116,7 @@ public class UserService : IUserService
     {
         return await _context.Users
             .Include(u => u.ProfessionalProfile)
+            .Include(u => u.ClientProfile)
             .ToListAsync();
     }
 
@@ -127,7 +128,7 @@ public class UserService : IUserService
             .ToListAsync();
     }
 
-    public async Task<User> UpdateProfileAsync(Guid id, string firstName, string lastName, string? phoneNumber, string? profilePictureUrl)
+    public async Task<User> UpdateProfileAsync(Guid id, string name, string? phoneNumber, string? profilePictureUrl)
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null)
@@ -135,9 +136,10 @@ public class UserService : IUserService
             throw new InvalidOperationException("User not found");
         }
 
-        user.Name = $"{firstName} {lastName}";
+        user.Name = name;
         user.PhoneNumber = phoneNumber;
         user.ProfilePictureUrl = profilePictureUrl;
+        user.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return user;
@@ -157,26 +159,54 @@ public class UserService : IUserService
         }
 
         user.IsProfessional = true;
-        user.UserType = "professional";
+        user.Role = UserRole.Professional;
+        user.UpdatedAt = DateTime.UtcNow;
 
         // Crear el perfil profesional
         var professionalProfile = new ProfessionalProfile
         {
+            Id = Guid.NewGuid(),
             UserId = user.Id,
-            Bio = "Perfil profesional recién creado",
-            IsActive = true
+            User = user,
+            Specialties = new List<string>(),
+            Experience = 0,
+            Description = "Perfil profesional recién creado",
+            HourlyRate = 0,
+            Availability = new Availability
+            {
+                Id = Guid.NewGuid(),
+                ProfessionalProfileId = user.Id,
+                ProfessionalProfile = user.ProfessionalProfile,
+                IsAvailable = true,
+                Schedule = new Dictionary<string, List<TimeSlot>>()
+            },
+            Ratings = new Rating
+            {
+                Id = Guid.NewGuid(),
+                ProfessionalProfileId = user.Id,
+                ProfessionalProfile = user.ProfessionalProfile,
+                Average = 0,
+                Count = 0
+            },
+            CompletedProjects = 0,
+            ActiveProjects = 0
         };
 
-        _context.ProfessionalProfiles.Add(professionalProfile);
+        user.ProfessionalProfile = professionalProfile;
         await _context.SaveChangesAsync();
 
         return user;
     }
 
-    private string HashPassword(string password)
+    public async Task<User> CreateProfessionalProfileAsync(User user, ProfessionalProfile profile)
     {
-        using var sha256 = SHA256.Create();
-        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return Convert.ToBase64String(hashedBytes);
+        user.IsProfessional = true;
+        user.Role = UserRole.Professional;
+        user.ProfessionalProfile = profile;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+        return user;
     }
 } 

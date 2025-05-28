@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Obralia.Core.Entities;
+using Obralia.Domain.Models;
 
 namespace Obralia.Infrastructure.Data;
 
@@ -12,11 +12,10 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<ProfessionalProfile> ProfessionalProfiles { get; set; } = null!;
+    public DbSet<ClientProfile> ClientProfiles { get; set; } = null!;
+    public DbSet<Availability> Availabilities { get; set; } = null!;
+    public DbSet<Rating> Ratings { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
-    public DbSet<ProfessionalAvailability> ProfessionalAvailabilities { get; set; } = null!;
-    public DbSet<ProfessionalBooking> ProfessionalBookings { get; set; } = null!;
-    public DbSet<Review> Reviews { get; set; } = null!;
-    public DbSet<Favorite> Favorites { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,39 +27,44 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Email).IsRequired();
             entity.Property(e => e.Name).IsRequired();
             entity.Property(e => e.PasswordHash).IsRequired();
-            entity.Property(e => e.UserType).IsRequired();
+            entity.Property(e => e.Role).IsRequired();
             entity.HasIndex(e => e.Email).IsUnique();
         });
 
-        // Favorite: relación User (como usuario) y User (como profesional)
-        modelBuilder.Entity<Favorite>()
-            .HasOne(f => f.User)
-            .WithMany(u => u.Favorites)
-            .HasForeignKey(f => f.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ProfessionalProfile>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.User)
+                .WithOne(u => u.ProfessionalProfile)
+                .HasForeignKey<ProfessionalProfile>(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
-        modelBuilder.Entity<Favorite>()
-            .HasOne(f => f.Professional)
-            .WithMany(u => u.FavoritedBy)
-            .HasForeignKey(f => f.ProfessionalId)
-            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ClientProfile>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.User)
+                .WithOne(u => u.ClientProfile)
+                .HasForeignKey<ClientProfile>(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
-        // Review: relación User (como usuario) y User (como profesional)
-        modelBuilder.Entity<Review>()
-            .HasOne(r => r.User)
-            .WithMany(u => u.Reviews)
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Availability>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.ProfessionalProfile)
+                .WithOne(p => p.Availability)
+                .HasForeignKey<Availability>(e => e.ProfessionalProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
-        modelBuilder.Entity<Review>()
-            .HasOne(r => r.Professional)
-            .WithMany(u => u.ReceivedReviews)
-            .HasForeignKey(r => r.ProfessionalId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Relación muchos a muchos entre ProfessionalProfile y Category
-        modelBuilder.Entity<ProfessionalProfile>()
-            .HasMany(p => p.Categories)
-            .WithMany(c => c.Professionals);
+        modelBuilder.Entity<Rating>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.ProfessionalProfile)
+                .WithOne(p => p.Ratings)
+                .HasForeignKey<Rating>(e => e.ProfessionalProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 } 

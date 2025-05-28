@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Obralia.Core.DTOs;
-using Obralia.Core.Entities;
-using Obralia.Core.Interfaces;
+using Obralia.Domain.Models;
+using Obralia.Infrastructure.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 
 namespace Obralia.API.Controllers;
 
@@ -41,7 +39,7 @@ public class AuthController : ControllerBase
                 return Unauthorized(new { message = "Usuario no autenticado" });
             }
 
-            var user = await _userService.GetByIdAsync(Guid.Parse(userId));
+            var user = await _userService.GetUserByIdAsync(Guid.Parse(userId));
             if (user == null)
             {
                 return NotFound(new { message = "Usuario no encontrado" });
@@ -52,7 +50,7 @@ public class AuthController : ControllerBase
                 id = user.Id,
                 email = user.Email,
                 name = user.Name,
-                userType = user.UserType,
+                role = user.Role,
                 isProfessional = user.IsProfessional,
                 isVerified = user.IsVerified,
                 profilePictureUrl = user.ProfilePictureUrl,
@@ -87,7 +85,7 @@ public class AuthController : ControllerBase
                     id = user.Id,
                     email = user.Email,
                     name = user.Name,
-                    userType = user.UserType
+                    role = user.Role
                 }
             });
         }
@@ -112,7 +110,7 @@ public class AuthController : ControllerBase
                 request.Email,
                 request.Password,
                 request.Name,
-                request.UserType
+                request.Role
             );
 
             var token = GenerateJwtToken(user);
@@ -125,7 +123,7 @@ public class AuthController : ControllerBase
                     id = user.Id,
                     email = user.Email,
                     name = user.Name,
-                    userType = user.UserType
+                    role = user.Role
                 }
             });
         }
@@ -160,7 +158,7 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.Name),
-            new Claim("UserType", user.UserType)
+            new Claim("Role", user.Role.ToString())
         };
 
         var token = new JwtSecurityToken(
@@ -187,4 +185,18 @@ public class AuthController : ControllerBase
 
         Response.Cookies.Append("auth_token", token, cookieOptions);
     }
+}
+
+public class LoginRequest
+{
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+}
+
+public class RegisterRequest
+{
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+    public required string Name { get; set; }
+    public required UserRole Role { get; set; }
 } 

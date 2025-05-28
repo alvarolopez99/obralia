@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Obralia.Core\Obralia.Core.csproj" />
+    <ProjectReference Include="..\Obralia.Domain\Obralia.Domain.csproj" />
   </ItemGroup>
 
 </Project>

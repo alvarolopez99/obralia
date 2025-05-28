@@ -14,7 +14,8 @@
           "Microsoft.EntityFrameworkCore": "8.0.2",
           "Microsoft.EntityFrameworkCore.Design": "8.0.2",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.2",
-          "Obralia.Core": "1.0.0"
+          "Obralia.Core": "1.0.0",
+          "Obralia.Domain": "1.0.0"
         },
         "runtime": {
           "Obralia.Infrastructure.dll": {}
@@ -602,6 +603,14 @@
             "fileVersion": "1.0.0.0"
           }
         }
+      },
+      "Obralia.Domain/1.0.0": {
+        "runtime": {
+          "Obralia.Domain.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -962,6 +971,11 @@
       "hashPath": "system.threading.channels.6.0.0.nupkg.sha512"
     },
     "Obralia.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Obralia.Domain/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
