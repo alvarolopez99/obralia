@@ -1,18 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiGrid, FiLogIn, FiInfo, FiMail, FiUser } from 'react-icons/fi';
+import { FiGrid, FiLogIn, FiInfo, FiMail, FiUser, FiChevronDown, FiSettings, FiLogOut, FiHome } from 'react-icons/fi';
 import SmartSearch from './SmartSearch';
 import { mockProfessionals } from '@/data/mockProfessionals';
 import { useAuth } from '../contexts/AuthContext';
 
+function stringToColor(str: string) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+        const value = (hash >> (i * 8)) & 0xff;
+        color += ("00" + value.toString(16)).slice(-2);
+    }
+    return color;
+}
+
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
     const isSearchPage = pathname.startsWith('/search');
     const { user, logout } = useAuth();
+
+    // Cerrar el dropdown al hacer click fuera
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsDropdownOpen(false);
+            }
+        }
+        if (isDropdownOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isDropdownOpen]);
 
     return (
         <nav className="bg-white shadow-md sticky top-0 z-30">
@@ -36,14 +71,14 @@ export default function Navbar() {
                         {!isSearchPage && (
                             <>
                                 <Link
-                                    href="como-funciona"
+                                    href="/como-funciona"
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors font-semibold"
                                 >
                                     <FiInfo size={18} />
                                     <span>Cómo funciona</span>
                                 </Link>
                                 <Link
-                                    href="contacto"
+                                    href="/contacto"
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors font-semibold"
                                 >
                                     <FiMail size={18} />
@@ -52,17 +87,65 @@ export default function Navbar() {
                             </>
                         )}
                         {user ? (
-                            <div className="flex items-center gap-4">
-                                <span className="text-gray-700">
-                                    {user.firstName} {user.lastName}
-                                </span>
+                            <div className="relative" ref={dropdownRef}>
                                 <button
-                                    onClick={logout}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
+                                    className="flex items-center gap-2 px-3 py-2 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                    onClick={() => setIsDropdownOpen((v) => !v)}
+                                    aria-label="Abrir menú de usuario"
                                 >
-                                    <FiUser size={18} />
-                                    <span>Cerrar sesión</span>
+                                    {user.profilePictureUrl ? (
+                                        <img
+                                            src={user.profilePictureUrl}
+                                            alt={user.name}
+                                            className="w-8 h-8 rounded-full object-cover border-2 border-blue-200"
+                                        />
+                                    ) : (
+                                        <span
+                                            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-lg"
+                                            style={{ background: stringToColor(user.name) }}
+                                        >
+                                            {user.name[0].toUpperCase()}
+                                        </span>
+                                    )}
+                                    <span className="font-semibold text-gray-700 max-w-[120px] truncate">
+                                        {user.name}
+                                    </span>
+                                    <FiChevronDown className={`ml-1 transition-transform ${isDropdownOpen ? "rotate-180" : "rotate-0"}`} />
                                 </button>
+                                {isDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border animate-fade-in">
+                                        <Link
+                                            href="/profile"
+                                            className="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 transition-colors"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                        >
+                                            <FiUser /> Mi perfil
+                                        </Link>
+                                        <Link
+                                            href="/dashboard"
+                                            className="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 transition-colors"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                        >
+                                            <FiHome /> Dashboard
+                                        </Link>
+                                        <Link
+                                            href="/configuracion"
+                                            className="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 transition-colors"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                        >
+                                            <FiSettings /> Configuración
+                                        </Link>
+                                        <button
+                                            onClick={() => {
+                                                logout();
+                                                setIsDropdownOpen(false);
+                                            }}
+                                            className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-red-50 text-red-600 transition-colors"
+                                        >
+                                            <FiLogOut /> Cerrar sesión
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <Link
@@ -106,38 +189,92 @@ export default function Navbar() {
                             {!isSearchPage && (
                                 <>
                                     <Link
-                                        href="#como-funciona"
+                                        href="/como-funciona"
                                         className="flex items-center gap-2 px-4 py-3 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors font-semibold"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
-                                        <FiInfo size={18} />
-                                        Cómo funciona
+                                        <FiInfo size={18} /> Cómo funciona
                                     </Link>
                                     <Link
-                                        href="#contacto"
+                                        href="/contacto"
                                         className="flex items-center gap-2 px-4 py-3 rounded-lg border border-gray-300 text-gray-400 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors font-semibold"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
-                                        <FiMail size={18} />
-                                        Contacto
+                                        <FiMail size={18} /> Contacto
                                     </Link>
                                 </>
                             )}
                             {user ? (
                                 <div className="flex flex-col space-y-2">
-                                    <span className="px-4 py-2 text-gray-700">
-                                        {user.firstName} {user.lastName}
-                                    </span>
                                     <button
+                                        className="flex items-center gap-2 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 transition-colors font-semibold"
                                         onClick={() => {
-                                            logout();
-                                            setIsMenuOpen(false);
+                                            setIsDropdownOpen((v) => !v);
                                         }}
-                                        className="flex items-center gap-2 px-4 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
                                     >
-                                        <FiUser size={18} />
-                                        Cerrar sesión
+                                        {user.profilePictureUrl ? (
+                                            <img
+                                                src={user.profilePictureUrl}
+                                                alt={user.name}
+                                                className="w-8 h-8 rounded-full object-cover border-2 border-blue-200"
+                                            />
+                                        ) : (
+                                            <span
+                                                className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-lg"
+                                                style={{ background: stringToColor(user.name) }}
+                                            >
+                                                {user.name[0].toUpperCase()}
+                                            </span>
+                                        )}
+                                        <span className="font-semibold text-gray-700 max-w-[120px] truncate">
+                                            {user.name}
+                                        </span>
+                                        <FiChevronDown className={`ml-1 transition-transform ${isDropdownOpen ? "rotate-180" : "rotate-0"}`} />
                                     </button>
+                                    {isDropdownOpen && (
+                                        <div className="bg-white rounded-lg shadow-lg py-2 border mt-2 animate-fade-in">
+                                            <Link
+                                                href="/profile"
+                                                className="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 transition-colors"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    setIsMenuOpen(false);
+                                                }}
+                                            >
+                                                <FiUser /> Mi perfil
+                                            </Link>
+                                            <Link
+                                                href="/dashboard"
+                                                className="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 transition-colors"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    setIsMenuOpen(false);
+                                                }}
+                                            >
+                                                <FiHome /> Dashboard
+                                            </Link>
+                                            <Link
+                                                href="/configuracion"
+                                                className="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 transition-colors"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    setIsMenuOpen(false);
+                                                }}
+                                            >
+                                                <FiSettings /> Configuración
+                                            </Link>
+                                            <button
+                                                onClick={() => {
+                                                    logout();
+                                                    setIsDropdownOpen(false);
+                                                    setIsMenuOpen(false);
+                                                }}
+                                                className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-red-50 text-red-600 transition-colors"
+                                            >
+                                                <FiLogOut /> Cerrar sesión
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <Link
@@ -145,8 +282,7 @@ export default function Navbar() {
                                     className="flex items-center gap-2 px-4 py-3 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors font-semibold"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    <FiLogIn size={18} />
-                                    Iniciar Sesión
+                                    <FiLogIn size={18} /> Iniciar Sesión
                                 </Link>
                             )}
                             {isSearchPage && (

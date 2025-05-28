@@ -1,14 +1,51 @@
+export enum UserRole {
+    CLIENT = 'client',
+    PROFESSIONAL = 'professional',
+    ADMIN = 'admin',
+    PROFESSIONAL_AND_CLIENT = 'professional_and_client'
+}
+
+export interface ProfessionalProfile {
+    specialties: string[];
+    experience: number;
+    description: string;
+    hourlyRate: number;
+    availability: {
+        isAvailable: boolean;
+        schedule: {
+            [key: string]: {
+                start: string;
+                end: string;
+            }[];
+        };
+    };
+    ratings: {
+        average: number;
+        count: number;
+    };
+    completedProjects: number;
+    activeProjects: number;
+}
+
+export interface ClientProfile {
+    activeProjects: number;
+    completedProjects: number;
+    totalSpent: number;
+}
+
 export interface User {
     id: string;
-    email: string;
     name: string;
-    userType: string;
-    isProfessional?: boolean;
-    isVerified?: boolean;
-    profilePictureUrl?: string;
+    email: string;
+    role: UserRole;
     phoneNumber?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    profilePictureUrl?: string;
+    isVerified: boolean;
+    isProfessional: boolean;
+    professionalProfile?: ProfessionalProfile;
+    clientProfile?: ClientProfile;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface LoginRequest {
@@ -16,11 +53,21 @@ export interface LoginRequest {
     password: string;
 }
 
+export interface LoginResponse {
+    user: User;
+    token: string;
+}
+
 export interface RegisterRequest {
+    name: string;
     email: string;
     password: string;
-    name: string;
-    userType: string;
+    phoneNumber?: string;
+}
+
+export interface RegisterResponse {
+    user: User;
+    token: string;
 }
 
 export interface GoogleLoginRequest {

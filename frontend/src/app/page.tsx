@@ -3,21 +3,17 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import ProfessionalCard from "@/components/ProfessionalCard";
 import { FiSearch, FiTool, FiZap, FiDroplet, FiHome, FiEdit, FiKey, FiFeather, FiUsers, FiMapPin, FiCheckCircle, FiClock, FiStar } from "react-icons/fi";
+import { BsSnow } from "react-icons/bs";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import SmartSearch from "@/components/SmartSearch";
 import { mockProfessionals } from "@/data/mockProfessionals";
+import useSWR from "swr";
+import { fetchCategories } from "@/services/categories";
 
-const categories = [
-  { name: 'Fontanería', icon: <FiDroplet size={24} />, key: 'fontaneria' },
-  { name: 'Electricidad', icon: <FiZap size={24} />, key: 'electricidad' },
-  { name: 'Albañilería', icon: <FiTool size={24} />, key: 'albanileria' },
-  { name: 'Carpintería', icon: <FiUsers size={24} />, key: 'carpinteria' },
-  { name: 'Pintura', icon: <FiEdit size={24} />, key: 'pintura' },
-  { name: 'Cerrajería', icon: <FiKey size={24} />, key: 'cerrajeria' },
-  { name: 'Jardinería', icon: <FiFeather size={24} />, key: 'jardineria' },
-  { name: 'Limpieza', icon: <FiTool size={24} />, key: 'limpieza' },
-];
+const iconMap: Record<string, any> = {
+  "Fontanería": <FiDroplet size={24} />, "Electricidad": <FiZap size={24} />, "Albañilería": <FiTool size={24} />, "Carpintería": <FiUsers size={24} />, "Pintura": <FiEdit size={24} />, "Cerrajería": <FiKey size={24} />, "Jardinería": <FiFeather size={24} />, "Limpieza": <FiTool size={24} />, "Climatización": <BsSnow size={24} />
+};
 
 const howItWorks = [
   {
@@ -42,6 +38,17 @@ const howItWorks = [
   }
 ];
 
+// Skeleton loader para categorías
+function CategorySkeleton() {
+  return (
+    <div className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-gray-100 bg-gray-100 animate-pulse">
+      <div className="w-10 h-10 rounded-full bg-gray-300 mb-4" />
+      <div className="h-4 w-20 bg-gray-300 rounded mb-2" />
+      <div className="h-3 w-16 bg-gray-200 rounded" />
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,9 +58,7 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const ITEMS_TO_SHOW = 5;
-  const ITEMS_TO_SLIDE = 3;
-  const ITEM_WIDTH = 320;
+  const { data: categories, isLoading, error } = useSWR("categories", fetchCategories);
 
   // Sincroniza el filtro con el query param
   useEffect(() => {
@@ -104,22 +109,32 @@ export default function Home() {
               </svg>
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            {categories.map((cat) => (
-              <button
-                key={cat.key}
-                onClick={() => handleCategoryClick(cat.key)}
-                className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-gray-100 hover:border-blue-400 transition-all bg-white hover:bg-blue-50 shadow-sm group"
-              >
-                <div className="text-gray-600 group-hover:text-blue-600 transition-colors">
-                  {cat.icon}
-                </div>
-                <span className="mt-3 font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
-                  {cat.name}
-                </span>
-              </button>
-            ))}
-          </div>
+          {isLoading && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <CategorySkeleton key={i} />
+              ))}
+            </div>
+          )}
+          {error && <div className="text-center text-red-500">Error al cargar servicios</div>}
+          {categories && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+              {categories.map((cat: any) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryClick(cat.id)}
+                  className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-gray-100 hover:border-blue-400 transition-all bg-white hover:bg-blue-50 shadow-sm group"
+                >
+                  <div className="text-gray-600 group-hover:text-blue-600 transition-colors">
+                    {iconMap[cat.name] || cat.icon || <FiTool size={24} />}
+                  </div>
+                  <span className="mt-3 font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                    {cat.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
