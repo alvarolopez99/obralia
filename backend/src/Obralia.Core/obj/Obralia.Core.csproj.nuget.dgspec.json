@@ -1,0 +1,67 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/Obralia.Core.csproj": {}
+  },
+  "projects": {
+    "/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/Obralia.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/Obralia.Core.csproj",
+        "projectName": "Obralia.Core",
+        "projectPath": "/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/Obralia.Core.csproj",
+        "packagesPath": "/Users/alvarolopezsierra/.nuget/packages/",
+        "outputPath": "/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/alvarolopezsierra/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {},
+          "https://nuget.pkg.github.com/easyjet-dev/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.405/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

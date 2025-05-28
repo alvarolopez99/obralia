@@ -1,0 +1,12 @@
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/bin/Debug/net8.0/Obralia.Core.deps.json
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/bin/Debug/net8.0/Obralia.Core.dll
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/bin/Debug/net8.0/Obralia.Core.pdb
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/Obralia.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/Obralia.Core.AssemblyInfoInputs.cache
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/Obralia.Core.AssemblyInfo.cs
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/Obralia.Core.csproj.CoreCompileInputs.cache
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/Obralia.Core.sourcelink.json
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/Obralia.Core.dll
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/refint/Obralia.Core.dll
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/Obralia.Core.pdb
+/Users/alvarolopezsierra/Desktop/dev/obralia/backend/src/Obralia.Core/obj/Debug/net8.0/ref/Obralia.Core.dll

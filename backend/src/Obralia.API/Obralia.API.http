@@ -1,0 +1,6 @@
+@Obralia.API_HostAddress = http://localhost:5138
+
+GET {{Obralia.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

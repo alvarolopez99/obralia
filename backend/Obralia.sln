@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{705A8824-01B1-4D33-88CF-949D81485353}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obralia.API", "src\Obralia.API\Obralia.API.csproj", "{E9430C6B-D028-4155-B7E4-4FCCDD0315C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obralia.Core", "src\Obralia.Core\Obralia.Core.csproj", "{781CEE39-8B27-4F00-8055-7B4B4A5E4836}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obralia.Infrastructure", "src\Obralia.Infrastructure\Obralia.Infrastructure.csproj", "{2AE216FF-6C71-4E97-8893-29F9496BD5D5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8D41A564-704E-4D7E-B5B5-F499B5EE2D1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obralia.UnitTests", "tests\Obralia.UnitTests\Obralia.UnitTests.csproj", "{06FBB8CF-A09D-4320-B2D4-EB03212D5F25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obralia.IntegrationTests", "tests\Obralia.IntegrationTests\Obralia.IntegrationTests.csproj", "{773FE62D-D1F3-40E9-A0B3-ADF2FE8DC9C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9430C6B-D028-4155-B7E4-4FCCDD0315C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9430C6B-D028-4155-B7E4-4FCCDD0315C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9430C6B-D028-4155-B7E4-4FCCDD0315C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9430C6B-D028-4155-B7E4-4FCCDD0315C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{781CEE39-8B27-4F00-8055-7B4B4A5E4836}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{781CEE39-8B27-4F00-8055-7B4B4A5E4836}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{781CEE39-8B27-4F00-8055-7B4B4A5E4836}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{781CEE39-8B27-4F00-8055-7B4B4A5E4836}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AE216FF-6C71-4E97-8893-29F9496BD5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AE216FF-6C71-4E97-8893-29F9496BD5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AE216FF-6C71-4E97-8893-29F9496BD5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AE216FF-6C71-4E97-8893-29F9496BD5D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06FBB8CF-A09D-4320-B2D4-EB03212D5F25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06FBB8CF-A09D-4320-B2D4-EB03212D5F25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06FBB8CF-A09D-4320-B2D4-EB03212D5F25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06FBB8CF-A09D-4320-B2D4-EB03212D5F25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{773FE62D-D1F3-40E9-A0B3-ADF2FE8DC9C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{773FE62D-D1F3-40E9-A0B3-ADF2FE8DC9C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{773FE62D-D1F3-40E9-A0B3-ADF2FE8DC9C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{773FE62D-D1F3-40E9-A0B3-ADF2FE8DC9C7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E9430C6B-D028-4155-B7E4-4FCCDD0315C6} = {705A8824-01B1-4D33-88CF-949D81485353}
+		{781CEE39-8B27-4F00-8055-7B4B4A5E4836} = {705A8824-01B1-4D33-88CF-949D81485353}
+		{2AE216FF-6C71-4E97-8893-29F9496BD5D5} = {705A8824-01B1-4D33-88CF-949D81485353}
+		{06FBB8CF-A09D-4320-B2D4-EB03212D5F25} = {8D41A564-704E-4D7E-B5B5-F499B5EE2D1B}
+		{773FE62D-D1F3-40E9-A0B3-ADF2FE8DC9C7} = {8D41A564-704E-4D7E-B5B5-F499B5EE2D1B}
+	EndGlobalSection
+EndGlobal

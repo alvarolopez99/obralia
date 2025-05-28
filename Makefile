@@ -1,4 +1,4 @@
-.PHONY: install dev build start test lint clean help
+.PHONY: install dev build start test lint clean help run-backend run-frontend run-all
 
 # Variables
 NODE_ENV ?= development
@@ -20,6 +20,9 @@ help: ## Muestra la ayuda
 	@echo "  ${BLUE}make test${NC}       - Ejecuta los tests"
 	@echo "  ${BLUE}make lint${NC}       - Ejecuta el linter"
 	@echo "  ${BLUE}make clean${NC}      - Limpia los archivos generados"
+	@echo "  ${BLUE}make run-backend${NC} - Levanta el backend"
+	@echo "  ${BLUE}make run-frontend${NC} - Levanta el frontend"
+	@echo "  ${BLUE}make run-all${NC}    - Levanta el backend y el frontend"
 	@echo ""
 
 install: ## Instala las dependencias
@@ -53,6 +56,15 @@ clean: ## Limpia los archivos generados
 	rm -rf frontend/.next
 	rm -rf frontend/node_modules
 	@echo "${GREEN}✓ Archivos limpiados${NC}"
+
+run-backend:
+	cd backend/src/Obralia.API && dotnet run
+
+run-frontend:
+	cd frontend && npm run dev
+
+run-all:
+	( cd backend/src/Obralia.API && dotnet run & ) && ( cd frontend && npm run dev )
 
 # Comando por defecto
 .DEFAULT_GOAL := help 

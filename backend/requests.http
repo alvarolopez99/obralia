@@ -1,0 +1,77 @@
+@baseUrl = http://localhost:7001
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Ijg0NGY0OTNmLWViYWEtNDQ3Ni1hMTg0LTIwZDdkYzYwNjgwZiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InRlc3RAZXhhbXBsZS5jb20iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9naXZlbm5hbWUiOiJKb2huIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvc3VybmFtZSI6IkRvZSIsIklzUHJvZmVzc2lvbmFsIjoiRmFsc2UiLCJleHAiOjE3NDg5Nzg5NDAsImlzcyI6Im9icmFsaWEtYXBpIiwiYXVkIjoib2JyYWxpYS1jbGllbnQifQ.cJ25mJ3hC79DZfPqFWihsQLUKty_-E8__JFrMmT3ltg
+
+### Variables para pruebas
+@testEmail = test@example.com
+@testPassword = Test123!
+@testFirstName = John
+@testLastName = Doe
+@testGoogleId = 123456789
+
+### 1. Registro de usuario normal
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "{{testEmail}}",
+    "password": "{{testPassword}}",
+    "firstName": "{{testFirstName}}",
+    "lastName": "{{testLastName}}"
+}
+
+### 2. Login de usuario normal
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "{{testEmail}}",
+    "password": "{{testPassword}}"
+}
+
+### 3. Registro/Login con Google
+POST {{baseUrl}}/api/auth/google
+Content-Type: application/json
+
+{
+    "email": "{{testEmail}}",
+    "googleId": "{{testGoogleId}}",
+    "firstName": "{{testFirstName}}",
+    "lastName": "{{testLastName}}"
+}
+
+### 4. Obtener información del usuario actual (requiere autenticación)
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{authToken}}
+
+### 5. Intentar registrar un email duplicado (debería fallar)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "{{testEmail}}",
+    "password": "{{testPassword}}",
+    "firstName": "{{testFirstName}}",
+    "lastName": "{{testLastName}}"
+}
+
+### 6. Login con credenciales incorrectas (debería fallar)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "{{testEmail}}",
+    "password": "wrong-password"
+}
+
+### 7. Intentar acceder a /me sin token (debería fallar)
+GET {{baseUrl}}/api/auth/me
+
+### Notas de uso:
+# 1. Reemplaza {{authToken}} con el token JWT recibido después de un login exitoso
+# 2. Puedes modificar las variables de prueba al inicio del archivo
+# 3. Para probar el flujo completo:
+#    a. Registra un usuario nuevo
+#    b. Copia el token recibido y reemplaza {{authToken}}
+#    c. Prueba el endpoint /me con el token
+#    d. Intenta registrar el mismo email (debería fallar)
+#    e. Prueba login con credenciales incorrectas (debería fallar) 
